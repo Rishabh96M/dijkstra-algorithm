@@ -34,6 +34,21 @@ def validPoint(point, map_len, map_bre):
 
 
 def getAdjNodes(curr_node, map_len, map_bre):
+    """
+    Definition
+    ---
+    Method to generate all adjacent nodes for a given node
+
+    Parameters
+    ---
+    curr_node : node of intrest
+    map_len : length of map
+    map_bre : breadth of map
+
+    Returns
+    ---
+    adjNodes : list of adjacent nodes with cost from parent node
+    """
     adjNodes = []
     if(validPoint((curr_node[0] + 1, curr_node[1]), map_len, map_bre)):
         adjNodes.append(((curr_node[0] + 1, curr_node[1]), 1))
@@ -55,6 +70,27 @@ def getAdjNodes(curr_node, map_len, map_bre):
 
 
 def updateNode(new_node, curr_node, node_cost, queue, parent_map, cost):
+    """
+    Definition
+    ---
+    Method to update nodes based on cost and closed list of nodes
+
+    Parameters
+    ---
+    new_node : node of intrest
+    curr_node : parent node
+    node_cost : dict of all nodes mapped to costs
+    queue : priority queue of nodes to check
+    parent_map : dict of nodes mapped to parent node_cost
+    cost : cost to get to new node from parent node
+
+    Returns
+    ---
+    Reached : if new_node is goal node returns True othervise returns False
+    node_cost : dict of all nodes mapped to costs
+    queue : priority queue of nodes to check
+    parent_map : dict of nodes mapped to parent node_cost
+    """
     new_cost = node_cost[curr_node] + cost
     temp_cost = node_cost.get(new_node)
     if not temp_cost or (temp_cost > new_cost):
@@ -67,6 +103,24 @@ def updateNode(new_node, curr_node, node_cost, queue, parent_map, cost):
 
 
 def dijkstra_path(start, goal, map_len, map_bre):
+    """
+    Definition
+    ---
+    Method to get least cost path from starting to goal node using dijkstra's
+
+    Parameters
+    ---
+    start : starting node
+    goal : goal node
+    map_len : length of map
+    map_bre : breadth of map
+
+    Returns
+    ---
+    Reached : if path is found True othervise False
+    parent_map : dict of nodes mapped to parent node_cost
+    node_cost : dict of all nodes mapped to costs
+    """
     closed = []
     queue = []
     node_cost = defaultdict(lambda: float('inf'))
@@ -93,7 +147,22 @@ def dijkstra_path(start, goal, map_len, map_bre):
     return reached, parent_map, node_cost
 
 
-def getPath(parent_map, goal, start):
+def getPath(parent_map, start, goal):
+    """
+    Definition
+    ---
+    Method to generate path using backtracking
+
+    Parameters
+    ---
+    parent_map : dict of nodes mapped to parent node_cost
+    start : starting node
+    goal : goal node
+
+    Returns
+    ---
+    path: list of all the points from starting to goal position
+    """
     curr_node = goal
     parent_node = parent_map[goal]
     path = [curr_node]
@@ -122,10 +191,16 @@ if __name__ == '__main__':
             if flag:
                 print('Path Found')
                 path = getPath(parent_map, goal, start)
+                path_x = []
+                path_y = []
                 for point in path:
-                    plt.plot(point[0], point[1], 'ko')
+                    path_x.append(point[0])
+                    path_y.append(point[1])
                 plt.plot(goal[0], goal[1], 'ro')
                 plt.plot(start[0], start[1], 'go')
+                plt.plot(path_x, path_y, 'k-')
+                plt.xlim([0, map_len])
+                plt.ylim([0, map_bre])
                 plt.show()
             else:
                 print('Path not found')
