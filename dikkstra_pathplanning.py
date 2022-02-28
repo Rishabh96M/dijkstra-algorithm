@@ -190,17 +190,18 @@ if __name__ == '__main__':
                 start, goal, map_len, map_bre)
             if flag:
                 print('Path Found')
-                path = getPath(parent_map, goal, start)
+                path = getPath(parent_map, start, goal)
                 path_x = []
                 path_y = []
                 for point in path:
                     path_x.append(point[0])
                     path_y.append(point[1])
-                plt.plot(goal[0], goal[1], 'ro')
-                plt.plot(start[0], start[1], 'go')
-                plt.plot(path_x, path_y, 'k-')
+                plt.plot(goal[0], goal[1], 'ro', label='goal point')
+                plt.plot(start[0], start[1], 'go', label='starting point')
+                plt.plot(path_x, path_y, 'k-', label='path')
                 plt.xlim([0, map_len])
                 plt.ylim([0, map_bre])
+                plt.legend()
                 plt.show()
             else:
                 print('Path not found')
