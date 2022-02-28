@@ -7,7 +7,6 @@
 
 import heapq as heap
 import matplotlib.pyplot as plt
-from collections import defaultdict
 
 
 def validPoint(point, map_len, map_bre):
@@ -123,13 +122,16 @@ def dijkstra_path(start, goal, map_len, map_bre):
     """
     closed = []
     queue = []
-    node_cost = defaultdict(lambda: float('inf'))
     node_cost = {}
     parent_map = {}
     reached = False
 
     node_cost[start] = 0
     heap.heappush(queue, (0, start))
+
+    if goal == start:
+        reached = True
+        parent_map[goal] = start
 
     while not reached and queue:
         curr_cost, curr_node = heap.heappop(queue)
@@ -138,7 +140,7 @@ def dijkstra_path(start, goal, map_len, map_bre):
         for new_node, cost in adjNodes:
             if new_node in closed:
                 continue
-            # print('checking for node: ', new_node)
+            print('checking for node: ', new_node)
             flag, node_cost, queue, parent_map = updateNode(
                 new_node, curr_node, node_cost, queue, parent_map, cost)
             if flag:
@@ -191,6 +193,7 @@ if __name__ == '__main__':
             if flag:
                 print('Path Found')
                 path = getPath(parent_map, start, goal)
+                print(path)
                 path_x = []
                 path_y = []
                 for point in path:
