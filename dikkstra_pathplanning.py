@@ -11,6 +11,20 @@ import numpy as np
 
 
 def listOfValidPoints(map_len, map_bre):
+    """
+    Definition
+    ---
+    Method to generate a list of all valid points on a map
+
+    Parameters
+    ---
+    map_len : length of map
+    map_bre : breadth of map
+
+    Returns
+    ---
+    validPoints : list of all the valid points
+    """
     validPoints = []
 
     # Defining Circle
@@ -28,10 +42,29 @@ def listOfValidPoints(map_len, map_bre):
     x4 = 105
     y4 = 100
 
+    # Defining Hexagon
+    x5 = 200
+    y5 = 140.4
+    x6 = 235
+    y6 = 120.2
+    x7 = 235
+    y7 = 79.8
+    x8 = 200
+    y8 = 59.6
+    x9 = 165
+    y9 = 79.8
+    x0 = 165
+    y0 = 120.2
+
     m21 = (y2 - y1) / (x2 - x1)
     m32 = (y3 - y2) / (x3 - x2)
     m43 = (y4 - y3) / (x4 - x3)
     m14 = (y1 - y4) / (x1 - x4)
+
+    m65 = (y6 - y5) / (x6 - x5)
+    m87 = (y8 - y7) / (x8 - x7)
+    m98 = (y9 - y8) / (x9 - x8)
+    m50 = (y5 - y0) / (x5 - x0)
 
     th = np.linspace(0, 2 * 3.14, 720)
     plt.plot(xc + (rc * np.cos(th)), yc + (rc * np.sin(th)), 'b-')
@@ -41,13 +74,28 @@ def listOfValidPoints(map_len, map_bre):
     plt.plot((x3, x4), (y3, y4), 'b-')
     plt.plot((x4, x1), (y4, y1), 'b-')
 
+    plt.plot((x5, x6), (y5, y6), 'b-')
+    plt.plot((x6, x7), (y6, y7), 'b-')
+    plt.plot((x7, x8), (y7, y8), 'b-')
+    plt.plot((x8, x9), (y8, y9), 'b-')
+    plt.plot((x9, x0), (y9, y0), 'b-')
+    plt.plot((x0, x5), (y0, y5), 'b-')
+
     for x in range(0, map_len + 1):
         for y in range(0, map_bre + 1):
             if ((x - xc)**2 + (y - yc)**2) <= rc**2:
                 continue
-            if (y-y1) <= (m21*(x-x1)) and (y-y2) >= (m32*(x-x2)) and (y-y4) >= (m14*(x-x4)):
+            if (y-y1) <= (m21*(x-x1)) and (y-y2) >= (m32*(x-x2)) and \
+               (y-y4) >= (m14*(x-x4)):
                 continue
-            if (y-y1) <= (m21*(x-x1)) and (y-y3) <= (m43*(x-x3)) and (y-y4) >= (m14*(x-x4)):
+            if (y-y1) <= (m21*(x-x1)) and (y-y3) <= (m43*(x-x3)) and \
+               (y-y4) >= (m14*(x-x4)):
+                continue
+            if x <= x6 and x >= x9 and y >= y9 and y <= y6:
+                continue
+            if y >= y6 and (y-y5) <= (m65*(x-x5)) and (y-y0) <= (m50*(x-x0)):
+                continue
+            if y <= y9 and (y-y7) >= (m87*(x-x7)) and (y-y8) >= (m98*(x-x8)):
                 continue
             validPoints.append((x, y))
     return validPoints
@@ -210,9 +258,9 @@ if __name__ == '__main__':
                 plt.plot(start[0], start[1], 'go', label='starting point')
                 plt.xlim([0, map_len])
                 plt.ylim([0, map_bre])
-                for point in closed:
-                    plt.plot(point[0], point[1], 'yo')
-                    plt.pause(0.00001)
+                # for point in closed:
+                #     plt.plot(point[0], point[1], 'yo')
+                #     plt.pause(0.00001)
                 path_x = []
                 path_y = []
                 for point in path:
