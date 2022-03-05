@@ -10,11 +10,11 @@ The robot is a point robot with a radius of 5mm as clearance <br>
 
 The robot action space is an 8 connected space, that means now you can move the robot in up, down, left, right & diagonally between up-left, up-right, down-left and down-right directions. <br>
 <br>
-Action Space of Robot
+**Action Space of Robot**
 ![Action Space of Robot](/res/action.png "Action Space of Robot")
 Action Sets = {(1,0), (-1,0), (0,1), (0,-1), (1,1), (-1,1), (1,-1), (-1,-1)}<br>
 <br>
-Map
+**Map**
 ![Map](/res/map.png "Map")
 
 ## To install the dependencies
