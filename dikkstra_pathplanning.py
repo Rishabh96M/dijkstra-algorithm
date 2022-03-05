@@ -6,11 +6,11 @@
 # to goal poisiton
 
 import heapq as heap
-import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 
 
-def listOfValidPoints(map_len, map_bre):
+def listOfValidPoints(map_len, map_bre, clearance):
     """
     Definition
     ---
@@ -56,6 +56,7 @@ def listOfValidPoints(map_len, map_bre):
     x0 = 165
     y0 = 120.2
 
+    # Slopes of the lines
     m21 = (y2 - y1) / (x2 - x1)
     m32 = (y3 - y2) / (x3 - x2)
     m43 = (y4 - y3) / (x4 - x3)
@@ -66,23 +67,8 @@ def listOfValidPoints(map_len, map_bre):
     m98 = (y9 - y8) / (x9 - x8)
     m50 = (y5 - y0) / (x5 - x0)
 
-    th = np.linspace(0, 2 * 3.14, 720)
-    plt.plot(xc + (rc * np.cos(th)), yc + (rc * np.sin(th)), 'b-')
-
-    plt.plot((x1, x2), (y1, y2), 'b-')
-    plt.plot((x2, x3), (y2, y3), 'b-')
-    plt.plot((x3, x4), (y3, y4), 'b-')
-    plt.plot((x4, x1), (y4, y1), 'b-')
-
-    plt.plot((x5, x6), (y5, y6), 'b-')
-    plt.plot((x6, x7), (y6, y7), 'b-')
-    plt.plot((x7, x8), (y7, y8), 'b-')
-    plt.plot((x8, x9), (y8, y9), 'b-')
-    plt.plot((x9, x0), (y9, y0), 'b-')
-    plt.plot((x0, x5), (y0, y5), 'b-')
-
-    for x in range(0, map_len + 1):
-        for y in range(0, map_bre + 1):
+    for x in range(map_len + 1):
+        for y in range(map_bre + 1):
             if ((x - xc)**2 + (y - yc)**2) <= rc**2:
                 continue
             if (y-y1) <= (m21*(x-x1)) and (y-y2) >= (m32*(x-x2)) and \
@@ -101,7 +87,7 @@ def listOfValidPoints(map_len, map_bre):
     return validPoints
 
 
-def getAdjNodes(curr_node, validPoints):
+def getAdjNodes(curr_node, validPoints, clearance):
     """
     Definition
     ---
@@ -119,10 +105,21 @@ def getAdjNodes(curr_node, validPoints):
     adjNodes = []
     moves = [(1, 0, 1), (-1, 0, 1), (0, 1, 1), (0, -1, 1), (1, 1, 1.4),
              (1, -1, 1.4), (-1, 1, 1.4), (-1, -1, 1.4)]
+    flag = True
     for move in moves:
+        # Checking if the point is valid
         if (curr_node[0] + move[0], curr_node[1] + move[1]) in validPoints:
-            adjNodes.append(((curr_node[0] + move[0], curr_node[1] + move[1]),
-                            move[2]))
+            # Checking for clearance
+            for i in range(clearance):
+                if not (curr_node[0] + move[0] + (i * move[0]), curr_node[1]
+                        + move[1] + (i * move[1])) in validPoints:
+                    flag = False
+                    break
+                if not flag:
+                    break
+            if flag:
+                adjNodes.append(((curr_node[0] + move[0],
+                                curr_node[1] + move[1]), move[2]))
     return adjNodes
 
 
@@ -160,7 +157,7 @@ def updateNode(new_node, curr_node, node_cost, queue, parent_map, cost, goal):
     return False, node_cost, queue, parent_map
 
 
-def dijkstra_path(start, goal, validPoints):
+def dijkstra_path(start, goal, validPoints, clearance):
     """
     Definition
     ---
@@ -176,7 +173,7 @@ def dijkstra_path(start, goal, validPoints):
     ---
     Reached : if path is found True othervise False
     parent_map : dict of nodes mapped to parent node_cost
-    node_cost : dict of all nodes mapped to costs
+    closed : list of all the explored nodes
     """
     closed = []
     queue = []
@@ -194,7 +191,7 @@ def dijkstra_path(start, goal, validPoints):
     while not reached and queue:
         curr_cost, curr_node = heap.heappop(queue)
         closed.append(curr_node)
-        adjNodes = getAdjNodes(curr_node, validPoints)
+        adjNodes = getAdjNodes(curr_node, validPoints, clearance)
         for new_node, cost in adjNodes:
             if new_node in closed:
                 continue
@@ -204,7 +201,7 @@ def dijkstra_path(start, goal, validPoints):
             if flag:
                 reached = True
                 break
-    return reached, parent_map, node_cost, closed
+    return reached, parent_map, closed
 
 
 def getPath(parent_map, start, goal):
@@ -234,12 +231,46 @@ def getPath(parent_map, start, goal):
     return path[::-1]
 
 
+def animate(map_len, map_bre, validPoints, closed, path):
+    """
+    Definition
+    ---
+    Method to animate the nodes explored by dijkstra's algorithm and plot the
+    best path
+
+    Parameters
+    ---
+    map_len : length of map
+    map_bre : breadth of map
+    validPoints : list of all valid points
+    closed : list of all the explored nodes
+    path: list of all the points from starting to goal position
+    """
+    map_frame = np.zeros((map_bre + 1, map_len + 1, 3))
+    delay = 5
+    cnt = 0
+    for point in validPoints:
+        map_frame[map_bre - point[1], point[0]] = [255, 0, 0]
+    for point in closed:
+        map_frame[map_bre - point[1], point[0]] = [0, 255, 0]
+        cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
+        cnt = cnt + 1
+        if cnt == delay:
+            cnt = 0
+            cv2.waitKey(1)
+    for point in path:
+        map_frame[map_bre - point[1], point[0]] = [0, 0, 255]
+        cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
+        cv2.waitKey(1)
+
+
 if __name__ == '__main__':
     map_len = 400
     map_bre = 250
-    flag = False
+    clearance = 5
+
     print('Validating all points in the map. Please wait...')
-    points = listOfValidPoints(map_len, map_bre)
+    points = listOfValidPoints(map_len, map_bre, clearance)
 
     start = input("Input Staring Position in format: x,y\n")
     start = (int(start.split(',')[0]), int(start.split(',')[1]))
@@ -248,31 +279,21 @@ if __name__ == '__main__':
         goal = (int(goal.split(',')[0]), int(goal.split(',')[1]))
         if goal in points:
             print('performing')
-            flag, parent_map, node_cost, closed = dijkstra_path(
-                start, goal, points)
+
+            flag, parent_map, closed = dijkstra_path(
+                start, goal, points, clearance)
+
             if flag:
                 print('Path Found')
                 path = getPath(parent_map, start, goal)
                 print(path)
-                plt.plot(goal[0], goal[1], 'ro', label='goal point')
-                plt.plot(start[0], start[1], 'go', label='starting point')
-                plt.xlim([0, map_len])
-                plt.ylim([0, map_bre])
-                # for point in closed:
-                #     plt.plot(point[0], point[1], 'yo')
-                #     plt.pause(0.00001)
-                path_x = []
-                path_y = []
-                for point in path:
-                    path_x.append(point[0])
-                    path_y.append(point[1])
-                plt.plot(path_x, path_y, 'k-', label='path')
-                plt.legend()
-                plt.show()
+                animate(map_len, map_bre, points, closed, path)
+                print('done!\nPress space-bar to exit')
+                cv2.waitKey(0)
             else:
                 print('Path not found')
                 print(parent_map)
         else:
-            print('Not a valid point')
+            print('Not a valid point, please try again')
     else:
-        print('Not a valid point')
+        print('Not a valid point, please try again')
