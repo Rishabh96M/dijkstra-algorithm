@@ -274,18 +274,19 @@ def animate(map_len, map_bre, validPoints, closed, path):
     map_frame = np.zeros((map_bre + 1, map_len + 1, 3))
     delay = 5
     cnt = 0
+    resize = (800, 500)
     for point in validPoints:
         map_frame[map_bre - point[1], point[0]] = [255, 255, 255]
     for point in closed:
         map_frame[map_bre - point[1], point[0]] = [0, 127, 0]
-        cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
+        cv2.imshow('map_frame', cv2.resize(map_frame, resize))
         cnt = cnt + 1
         if cnt == delay:
             cnt = 0
             cv2.waitKey(1)
     for point in path:
         map_frame[map_bre - point[1], point[0]] = [0, 0, 127]
-        cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
+        cv2.imshow('map_frame', cv2.resize(map_frame, resize))
         cv2.waitKey(1)
 
 

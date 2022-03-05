@@ -1,6 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Verified on Ubuntu 20.04 and python 3.8.10, packages used are heapq, cv2 and NumPy.
+Verified on Ubuntu 20.04 and python 3.8.10, packages used are heapq, cv2 and NumPy.<br>
+all units are in mm.
 
 # dijkstra-algorithm
 Implementing Dijkstra's Algorithm to find the shortest path for a point robot from starting position to goal position in a given map.
@@ -36,4 +37,4 @@ python dijkstra-algorithm.py
 ```
 This code will ask the user for starting point and goal point on the map. After the path is found, It will animate all searched nodes and display the optimal path found using dijkstra-algorithm <br>
 
-This ***videos*** folder contains example videos on how the program works.
+This ***videos*** folder contains example video for start point as 100, 180 and end point as 130, 230
