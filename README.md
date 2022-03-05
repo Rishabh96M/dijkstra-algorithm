@@ -9,10 +9,12 @@ Implementing Dijkstra's Algorithm to find the shortest path for a point robot fr
 The robot is a point robot with a radius of 5mm as clearance <br>
 
 The robot action space is an 8 connected space, that means now you can move the robot in up, down, left, right & diagonally between up-left, up-right, down-left and down-right directions. <br>
-
+<br>
+Action Space of Robot
 ![Action Space of Robot](/res/action.png "Action Space of Robot")
 Action Sets = {(1,0), (-1,0), (0,1), (0,-1), (1,1), (-1,1), (1,-1), (-1,-1)}<br>
-
+<br>
+Map
 ![Map](/res/map.png "Map")
 
 ## To install the dependencies
@@ -34,4 +36,4 @@ python dijkstra-algorithm.py
 ```
 This code will ask the user for starting point and goal point on the map. After the path is found, It will animate all searched nodes and display the optimal path found using dijkstra-algorithm <br>
 
-This *videos* folder contains example videos on how the program works. 
+This ***videos*** folder contains example videos on how the program works.
