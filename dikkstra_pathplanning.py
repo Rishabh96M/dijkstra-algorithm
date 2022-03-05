@@ -87,6 +87,29 @@ def listOfValidPoints(map_len, map_bre, clearance):
     return validPoints
 
 
+def isPointValid(point, validPoints, clearance):
+    """
+    Definition
+    ---
+    Method to check if point is valid and clear of obstacles
+
+    Parameters
+    ---
+    point : node of intrest
+    validPoints : list of all valid points
+    clearance : minimum distance required from obstacles
+
+    Returns
+    ---
+    bool : True if point is valid, False othervise
+    """
+    for i in range(-clearance, clearance):
+        for j in range(-clearance, clearance):
+            if not (point[0] + i, point[1] + j) in validPoints:
+                return False
+    return True
+
+
 def getAdjNodes(curr_node, validPoints, clearance):
     """
     Definition
@@ -97,6 +120,7 @@ def getAdjNodes(curr_node, validPoints, clearance):
     ---
     curr_node : node of intrest
     validPoints : list of all valid points
+    clearance : minimum distance required from obstacles
 
     Returns
     ---
@@ -168,6 +192,7 @@ def dijkstra_path(start, goal, validPoints, clearance):
     start : starting node
     goal : goal node
     validPoints : list of all valid points
+    clearance : minimum distance required from obstacles
 
     Returns
     ---
@@ -250,16 +275,16 @@ def animate(map_len, map_bre, validPoints, closed, path):
     delay = 5
     cnt = 0
     for point in validPoints:
-        map_frame[map_bre - point[1], point[0]] = [255, 0, 0]
+        map_frame[map_bre - point[1], point[0]] = [255, 255, 255]
     for point in closed:
-        map_frame[map_bre - point[1], point[0]] = [0, 255, 0]
+        map_frame[map_bre - point[1], point[0]] = [0, 127, 0]
         cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
         cnt = cnt + 1
         if cnt == delay:
             cnt = 0
             cv2.waitKey(1)
     for point in path:
-        map_frame[map_bre - point[1], point[0]] = [0, 0, 255]
+        map_frame[map_bre - point[1], point[0]] = [0, 0, 127]
         cv2.imshow('map_frame', cv2.resize(map_frame, (1600, 1000)))
         cv2.waitKey(1)
 
@@ -270,24 +295,25 @@ if __name__ == '__main__':
     clearance = 5
 
     print('Validating all points in the map. Please wait...')
-    points = listOfValidPoints(map_len, map_bre, clearance)
+    validPoints = listOfValidPoints(map_len, map_bre, clearance)
 
     start = input("Input Staring Position in format: x,y\n")
     start = (int(start.split(',')[0]), int(start.split(',')[1]))
-    if start in points:
+
+    if isPointValid(start, validPoints, clearance):
         goal = input("Input Goal Position in format: x,y\n")
         goal = (int(goal.split(',')[0]), int(goal.split(',')[1]))
-        if goal in points:
+        if isPointValid(goal, validPoints, clearance):
             print('performing')
 
             flag, parent_map, closed = dijkstra_path(
-                start, goal, points, clearance)
+                start, goal, validPoints, clearance)
 
             if flag:
                 print('Path Found')
                 path = getPath(parent_map, start, goal)
                 print(path)
-                animate(map_len, map_bre, points, closed, path)
+                animate(map_len, map_bre, validPoints, closed, path)
                 print('done!\nPress space-bar to exit')
                 cv2.waitKey(0)
             else:
